@@ -5,26 +5,119 @@
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <style>
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-            grid-gap: 10px;
+        body{
+            background-color: red;
+        }
+        .button-style {
+            border: none;
+            max-width: 2em;
+            font-size: 25px;
+            margin: 0px;
+            padding: 0px;
+            background-color: red;
+            color: white;
+        }
+        .counter {
+            max-width: 1.5em;
+            text-align: center;
+            margin: 0px;
+            padding: 0px;
+            background-color: red;
+            color: whitel
+            
+        }
+        .time-adjustment {
+            border: none;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color: red;
+            color: white;
+        }
+        #break-label {
+            text-align: center;
+            font-size: 30px;
+        }
+        #session-label {
+            text-align: center;
+            font-size: 30px;
+        }
+        #clockBody {
+            max-width: 80%;
+            background-color: red;
+            border: none;
+        }
+        #clock-title{
+            text-align: center;
+            font-size: 50px;
+            margin: 100px 0px 30px 0px;
+            color: white;
+        }
+        #display{
+            
+            vertical-align: middle;
+            text-align: center;
+            border: 6px solid;
+            padding: auto;
+            margin: auto;
+            width: 300px;
+            height: 170px;
+            border-radius: 2em;
+            border-color: gray;
+            color: white;
+        }
+        #controls{
 
-            background-color: #2196F3;
+            text-align: center;
+            margin: 15px auto 15px auto;
+            font-size: 20px;
+            background-color: red;
+            color: white;
+
+        }
+        #time-control-row{
+            margin-left: 50px;
+            margin-right: 50px;
+        }
+        #timer-label {
+            font-size: 35px;
+            padding: 10px 0px 0px 0px;
+            margin: 0px;
+        }
+        #time-left{
+            font-size: 80px;
             padding: 0px;
             margin: 0px;
         }
-
+        #bottom-credit{
+            font-size: 20px;
+            text-align: center;
+            color: blue;
+        }
+        #my-name{
+            font-size: 20px;
+            text-align: center;
+        }
+        #start_stop{
+            color: white;
+            background-color: red;
+            border: none;
+        }
+        #reset{
+            color: white;
+            background-color: red;
+            border: none;
+        }
     </style>
   </head>
   <body>
 
-    <div id="clockBody"></div>
+    <div id="clockBody" class="container"></div>
 
     <script type="text/babel">
-        
+        let audioClip = document.getElementById('beep');
+
 
         class CountdownClock extends React.Component {
 
@@ -37,7 +130,7 @@
                    sessionOrBreak: 0,
                    breakLength: 5,
                    sessionLength: 25, 
-                   breakMs: 25000,
+                   breakMs: 300000,
                    sessionMs: 1500000,
                    sessionDisplay: "Session",
                    timeLeft: 25.00, 
@@ -47,153 +140,404 @@
                 this.decrement = this.decrement.bind(this);
                 this.resetClock = this.resetClock.bind(this);
                 this.timerFunction = this.timerFunction.bind(this);
+                this.playPause = this.playPause.bind(this);
                 this.testFunction = this.testFunction.bind(this);
+                this.alarm = this.alarm.bind(this);
+                //this.timerTestFunction = this.timerTestFunction.bind(this);
 
             }
             testFunction (event) {
-                alert("Callback Test Success")
+                //alert("Callback Test Success")
             }
+            alarm (event) {
+                var audio = document.getElementById("beep");
+                audio.play();
+                
+            }
+            
            
             increment (event) {
-
-                switch (event.target.value){
-                    case "break-i":
-                        switch (this.state.breakLength) {
-                            case 60:
+                switch(this.state.play % 2){
+                    case 0:
+                        switch (event.target.value){
+                            case "break-i":
+                                switch (this.state.breakLength) {
+                                    case 60:
+                                        break;
+                                    default :
+                                        this.setState ((state, props) => ({
+                                            breakLength: state.breakLength + 1.00
+                                        }));
+                                        this.setState ((state, props) => ({
+                                            breakMs : state.breakLength * 60 * 1000
+                                        }));
+                                        if((this.state.sessionOrBreak % 2) == 1){
+                                            if(this.state.breakLength < 9){
+                                                this.setState ((state, props) => ({
+                                                    displayValue: "0" + state.breakLength + ":00"
+                                                }));
+                                            }
+                                            else {
+                                                this.setState ((state, props) => ({
+                                                    displayValue: state.breakLength + ":00"
+                                                }));
+                                            }                                           
+                                        }
+                                        break;
+                                }
                                 break;
-                            default :
-                                this.setState ((state, props) => ({
-                                    breakLength: state.breakLength + 1.00,
-                                    breakMs: state.breakMS + 1000
-                                }));
+                            case "session-i":
+                                switch (this.state.sessionLength){
+                                    case 60:
+                                        break;
+                                    default:
+                                        this.setState ((state, props) => ({
+                                            sessionLength: state.sessionLength + 1.00
+                                        }));
+                                        this.setState ((state, props) => ({
+                                            sessionMs : state.sessionLength * 60 * 1000
+                                        }));
+                                        if((this.state.sessionOrBreak % 2) == 0){
+                                            if(this.state.sessionLength < 9){
+                                                this.setState ((state, props) => ({
+                                                    displayValue: "0" + state.sessionLength + ":00"
+                                                }));
+                                            }
+                                            else {
+                                                this.setState ((state, props) => ({
+                                                    displayValue: state.sessionLength + ":00"
+                                                }));
+                                            }                                           
+                                        }
+                                        break;
+                                }
                                 break;
                         }
                         break;
-                    case "session-i":
-                        switch (this.state.sessionLength){
-                            case 60:
-                                break;
-                            default:
-                                this.setState ((state, props) => ({
-                                    sessionLength: state.sessionLength + 1.00,
-                                    sessionMs : state.sessionMs + 1000
-                                }));
-                                break;
-                        }
+                    default:
                         break;
-                }
+                }  
             }
             decrement (event) {
-                switch (event.target.value){
-                    case "break-d":
-                        switch (this.state.breakLength) {
-                            case 1:
+                switch(this.state.play % 2){
+                    case 0:
+                        switch (event.target.value){
+                            case "break-d":
+                                switch (this.state.breakLength) {
+                                    case 1:
+                                        break;
+                                    default :
+                                        this.setState ((state, props) => ({
+                                            breakLength: state.breakLength - 1.00
+                                        }));
+                                        this.setState ((state, props) => ({
+                                            breakMs : state.breakLength * 60 * 1000
+                                        }));
+                                        if((this.state.sessionOrBreak % 2) == 1){
+                                            if(this.state.breakLength < 11){
+                                                this.setState ((state, props) => ({
+                                                    displayValue: "0" + state.breakLength + ":00"
+                                                }));
+                                            }
+                                            else {
+                                                this.setState ((state, props) => ({
+                                                    displayValue: state.breakLength + ":00"
+                                                }));
+                                            }                                           
+                                        }
+                                        break;
+                                }
                                 break;
-                            default :
-                                this.setState ((state, props) => ({
-                                    breakLength: state.breakLength - 1.00,
-                                    breakMs: state.breakMs - 1000
-                                }));
+                            case "session-d":
+                                switch (this.state.sessionLength){
+                                    case 1:
+                                        break;
+                                    default:
+                                        this.setState ((state, props) => ({
+                                            sessionLength: state.sessionLength - 1.00
+                                        }));
+                                        this.setState ((state, props) => ({
+                                            sessionMs : state.sessionLength * 60 * 1000
+                                        }));
+                                        if((this.state.sessionOrBreak % 2) == 0){
+                                            if(this.state.sessionLength < 11){
+                                                this.setState ((state, props) => ({
+                                                    displayValue: "0" + state.sessionLength + ":00"
+                                                }));
+                                            }
+                                            else {
+                                                this.setState ((state, props) => ({
+                                                    displayValue: state.sessionLength + ":00"
+                                                }));
+                                            }                                           
+                                        }
+                                        break;
+                                }
                                 break;
                         }
                         break;
-                    case "session-d":
-                        switch (this.state.sessionLength){
-                            case 1:
-                                break;
-                            default:
-                                this.setState ((state, props) => ({
-                                    sessionLength: state.sessionLength - 1.00,
-                                    sessionMS: state.sessionMs - 1000
-                                }));
-                                break;
-                        }
+                    default: 
                         break;
-                }
+                    }
             }
             timerFunction(event){
+                //alert(audioLink)
                 //alert("testing here")
                 //timeLeft is in milliseconds
                 //this.testFunction();
                 
+                //this.setState((state, props) => ({
+                    //play: state.play + 1,
+                //    sessionMs : state.sessionLength * 60 * 1000,
+                //    breakMs : state.breakLength * 60 * 1000
+                //}));
+                //let timeLeft = this.state.sessionMs;
                 this.setState((state, props) => ({
-                    play: state.play + 1,
-                    sessionMs : state.sessionLength * 60 * 1000,
-                    breakMs : state.breakLength * 60 * 1000
+                    play: state.play + 1
                 }));
-                let timeLeft = this.state.sessionMs;
-                /*
+                let timeLeft = null;
                 if((this.state.sessionOrBreak % 2) == 0){
-                    timeLeft = this.state.sessionMs
+                    timeLeft = this.state.sessionMs;
+                    this.setState((state, props) => ({
+                        sessionDisplay: "Session",
+                    }));
+               
                 } else {
-                    timeLeft = this.state.breakMs
+                    timeLeft = this.state.breakMs;
+                    this.setState((state, props) => ({
+                        sessionDisplay: "Break"
+                    }));
+
                 }
-                */
+                //breakLength: 5,
+                   
+
                 //this.state.sessionMs;
                 //alert(totalSeconds);
-                //if ((this.state.play % 2) == 1){
-                    setInterval(() => {
+                //if ((this.state.play % 2) == 0){
+                let timeVar = setInterval(() => {
+                    if(this.state.play % 2 == 0){
+                        clearInterval(timeVar);
+                    } else {
+                        //moved timeLeft back to its original location
+                        timeLeft -= 1000;
+                        
                         var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                         var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                        if(seconds == 0){
-                            seconds = "00";
+                        if(minutes < 10) {
+                            minutes = "0" + minutes;
                         }
-                        this.setState((state, props) =>({
-                            displayValue: minutes + ":" + seconds, 
-                            sessionMs: state.sessionMs - 1000
-                        }))
-                        timeLeft -= 1000;
-                        if (timeLeft == 0){
-                            this.setState((state, props) => ({
-                                sessionOrBreak: state.sessionOrBreak + 1
+                        if(seconds < 10){
+                            seconds = "0" + seconds;
+                        }
+                        //testing relocating incrementor for timeLeft. worked but had delay
+                        //timeLeft -= 1000;
+                        if(this.state.sessionOrBreak % 2 == 0){
+                            this.setState((state, props) =>({
+                                displayValue: minutes + ":" + seconds, 
+                                sessionMs: state.sessionMs - 1000
                             }));
-                            this.timerFunction();
+                        } else {
+                            this.setState((state, props) =>({
+                                displayValue: minutes + ":" + seconds, 
+                                breakMs: state.breakMs - 1000
+                            }));
                         }
-                    }, 1000); 
-                //}
-            }
-            //playPause (event) {
+                        //testing to see if relocating helps pass a test
+                        //timeLeft -= 1000;
+                        //testing adjusting timeLeft from 0 to -1000
+                        if (timeLeft == 0){
+                            // moving block below to timeLeft== -1 section for a test
+                            
+                            this.setState((state, props) => ({
+                                sessionOrBreak: state.sessionOrBreak + 1,
+                                //play: state.play + 1,
+                                //displayValue: "00:00",
+                                //testing if adding 1000 millisecond to breakMs and sessionMs will make it start counting at the full minute
+                                //removing the following two and adding below
+                                breakMs : state.breakLength * 60 * 1000 ,
+                                sessionMs : state.sessionLength * 60 * 1000 
+                            }));
+                            
+                            this.alarm();
+                            if((this.state.sessionOrBreak % 2) == 0){
 
-            //}
+                                this.setState((state, props) => ({
+                                    sessionDisplay: "Session",
+                                }));
+
+                            } else {
+
+                                this.setState((state, props) => ({
+                                    sessionDisplay: "Break"
+                                }));
+
+                            }
+                            /*
+                            if((this.state.sessionOrBreak % 2) == 0){
+
+                                this.setState((state, props) => ({
+                                    sessionDisplay: "Session",
+                                }));
+                        
+                            } else {
+
+                                this.setState((state, props) => ({
+                                    sessionDisplay: "Break"
+                                }));
+
+                            }
+                            */
+                            //experimenting with moving call of function outside of function and
+                            //clearing interval to fix problem
+                            //reseting session display
+                            /*if((this.state.sessionOrBreak % 2) == 0){
+                                if(this.state.sessionLength < 10){
+                                    this.setState((state, props) => ({
+                                        displayValue: "0" + state.sessionLength + ":00"
+                                    }));
+                                } else {
+                                    this.setState((state, props) => ({
+                                        displayValue: state.sessionLength + ":00"
+                                    }));
+                                }
+                            } else {
+                                if(this.state.breakLength < 10){
+                                    this.setState((state, props) => ({
+                                        displayValue: "0" + state.breakLength + ":00"
+                                    }));
+                                } else {
+                                    this.setState((state, props) => ({
+                                        displayValue: state.breakLength + ":00"
+                                    }));
+                                }
+                            } */
+                            //removing following and putting in code block below
+                            //this.timerFunction();
+                            //clearInterval(timeVar);
+                            
+                        }
+                        if(timeLeft == -1000){
+
+                            if(this.state.sessionOrBreak % 2 == 1){
+                                let initialBreakTime = this.state.breakLength
+                                if(initialBreakTime < 10) {
+                                    initialBreakTime = "0" + initialBreakTime;
+                                }
+                                this.setState((state, props) =>({
+                                    displayValue: initialBreakTime + ":00", 
+                                }));
+                            } else {
+                                let initialSessionTime = this.state.sessionLength
+                                if(initialSessionTime < 10) {
+                                    initialSessionTime = "0" + initialSessionTime;
+                                }
+                                this.setState((state, props) =>({
+                                    displayValue: initialSessionTime + ":00", 
+                                }));
+                            }
+                            //adding block for testing -- removed and put back into place
+                            
+                            this.setState((state, props) => ({
+                                //sessionOrBreak: state.sessionOrBreak + 1,
+                                play: state.play + 1,
+                                //displayValue: "00:00",
+                                //testing if adding 1000 millisecond to breakMs and sessionMs will make it start counting at the full minute
+                                //breakMs : state.breakLength * 60 * 1000 ,
+                                //sessionMs : state.sessionLength * 60 * 1000 
+                            }));
+                            
+                            // clearing chen time reaches -1 trying switching places
+                            clearInterval(timeVar);
+                            this.timerFunction();
+                            
+                        }
+                        
+                    }
+                }, 1000); 
+                //}
+                //testing to see if always clearing at end of function helps a problem
+
+                
+            }
+            playPause (event) {
+                //this.timerFunction();
+                this.setState((state, props) => ({
+                    play: state.play + 1
+                }));
+                let timerVar = this.timerFunction();
+                if(this.state.play % 2 == 1){
+                    //alert("test")
+                    //clearInterval(timerVar);
+                    //this.timerFunction();
+                    //timeVar;
+
+                } 
+                //else {
+                  //  clearInterval(timeVar)
+                //}
+                //alert(this.state.play);
+            }
                 
             resetClock (event) {
                 this.setState ((state, props) => ({
-                    play: false, 
+                    play: 0, 
+                    sessionOrBreak: 0,
                     breakLength: 5,
                     sessionLength: 25, 
+                    breakMs: 300000,
+                    sessionMs: 1500000,
                     sessionDisplay: "Session",
-                    timeLeft: 25,
-                    displayValue: "25:00" 
+                    timeLeft: 25.00, 
+                    displayValue: "25:00"
                 }));
+                
+                var audio = document.getElementById("beep");
+                audio.pause();                    
+                audio.currentTime = 0;
+                //audioClip.pause();
+                //audioClip.currentTime = 0;
             }
             render() {
 
                 return (
                     <div>
-                        <h1>25 + 5 Clock</h1>
-                        <div>
-                            <div>
-                                <h2 id="break-label">Break Length</h2>
-                                <button id="break-increment" value="break-i" onClick={this.increment}><i class="fas fa-arrow-up"></i></button>
-                                <h3 id="break-length">{this.state.breakLength}</h3>
-                                <button id="break-decrement" value="break-d" onClick={this.decrement}><i class="fas fa-arrow-down"></i></button>
-                            </div>
-                            <div>
-                                <h2 id="session-label">Session Length</h2>
-                                <button id="session-increment" value="session-i" onClick={this.increment}><i class="fas fa-arrow-up"></i></button>
-                                <h3 id="session-length">{this.state.sessionLength}</h3>
-                                <button id="session-decrement" value="session-d" onClick={this.decrement}><i class="fas fa-arrow-down"></i></button>
+                        <h1 id="clock-title">25 + 5 Clock</h1>
+                        <div class="container">
+                            <div class="row" id="time-control-row">
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-3 time-adjustment">
+                                    <h2 id="break-label">Break Length</h2>
+                                    {/*testing to see if you can add classes within button and skip using <i>*/}
+                                    <div class="row justify-content-center">
+                                        <button class="fas fa-arrow-up col button-style" id="break-increment" value="break-i" onClick={this.increment}></button>
+                                        <h3 id="break-length" class="col counter">{this.state.breakLength}</h3>
+                                        <button class="fas fa-arrow-down col button-style" id="break-decrement" value="break-d" onClick={this.decrement}></button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3 time-adjustment">
+                                    <h2 id="session-label">Session Length</h2>
+                                    <div class="row justify-content-center">
+                                        <button i class="fas fa-arrow-up col button-style" id="session-increment" value="session-i" onClick={this.increment}></button>
+                                        <h3 id="session-length" class="col counter">{this.state.sessionLength}</h3>
+                                        <button class="fas fa-arrow-down col button-style" id="session-decrement" value="session-d" onClick={this.decrement}></button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div>
+                        <div id="display">
                             <h4 id="timer-label">{this.state.sessionDisplay}</h4>
                             <h4 id="time-left">{this.state.displayValue}</h4>
+
                         </div>
 
-                        <div>
+                        <div id="controls">
                             <button id="start_stop" onClick={this.timerFunction}><i class="fas fa-play"></i><i class="fas fa-pause"></i></button>
                             <button id="reset" onClick={this.resetClock}><i class="fas fa-sync-alt"></i></button>
                         </div>
+                        <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+                        <h5 id="bottom-credit">Coded with Bootstrap and React by</h5>
+                        <h5 id="my-name">Adam Long</h5>
                     </div>
                 );
             }
